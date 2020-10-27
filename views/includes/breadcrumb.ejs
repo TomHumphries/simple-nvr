@@ -1,0 +1,8 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Cameras</a></li>
+        <% route.forEach(folder => { %>
+        <li class="breadcrumb-item"><a href="<%= folder.route %>"><%= folder.name %></a></li>
+        <% }); %>
+    </ol>
+</nav>

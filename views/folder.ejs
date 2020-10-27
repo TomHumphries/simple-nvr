@@ -1,0 +1,20 @@
+<%- include('includes/head.ejs') %>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+    <%- include('includes/header.ejs') %>
+
+    <div class="container py-4">
+
+        <%- include('includes/breadcrumb.ejs') %>
+
+        <div class="list-group">
+            <% for (let i = 0; i < locations.length; i++) { const location = locations[i]; %>
+            <a href="<%= location.route %>" class="list-group-item list-group-item-action"><%= location.name %></a>
+            <% } %>
+        </div>
+    </div>
+
+    <%- include('includes/footer.ejs') %>
+    <%- include('includes/end.ejs') %>
