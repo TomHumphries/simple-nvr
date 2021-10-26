@@ -11,6 +11,8 @@ const port = 3000;
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+app.use(require('./middleware/middleware.basic-auth'));
+
 // initialise the video-serving code
 app.use(require('./video-file-server'));
 
