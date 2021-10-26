@@ -9,7 +9,7 @@ const cameraConfigs = require('./cameras.json');
 const videoConcatinator = require('./video-concat.js');
 
 const videoLengthSeconds = 300; // 5 mins
-const timeoutRecordingWatcher = 1000 * 15; // 15 seconds
+const timeoutRecordingWatcher = 1000 * 310; // 5 minutes 10 seconds - increased due to mkv files not triggering changes as frequently
 const cameras = [];
 
 module.exports.initCameras = () => {
@@ -38,7 +38,7 @@ class CameraStream {
         this.args = [
             "-hide_banner",
             "-y", // overwrite files without asking
-            "-loglevel", "warning",
+            "-loglevel", "error",
             "-rtsp_transport", "tcp",
             "-use_wallclock_as_timestamps", "1", // Fix the timestamps in the file not being correct
             "-i", this.url,
@@ -46,10 +46,10 @@ class CameraStream {
             "-f", "segment",
             "-reset_timestamps", "1",
             "-segment_time", `${videoLengthSeconds}`,
-            "-segment_format", "mp4",
+            "-segment_format", "mkv",
             "-segment_atclocktime", "1",
             "-strftime", "1",
-            `${path.join(this.rawStoragePath, "%Y-%m-%dT%H %M %S%z.mp4")}`
+            `${path.join(this.rawStoragePath, "%Y-%m-%dT%H %M %S%z.mkv")}`
         ];
 
         this.initTimeoutWatcher();
@@ -161,7 +161,7 @@ class CameraStream {
         const filepaths = [];
         while (listOfFiles.length > 1) {
             const filename = listOfFiles.shift();
-            if (filename.endsWith('.mp4')) {
+            if (filename.endsWith('.mkv')) {
                 filepaths.push(path.join(this.rawStoragePath, filename));
             }
         }
@@ -169,7 +169,7 @@ class CameraStream {
     }
 
     async moveFileToDated(filepath) {
-        const fileDateName = path.basename(filepath, '.mp4');
+        const fileDateName = path.basename(filepath, '.mkv');
         let dateString = fileDateName.split(' ').join(':');
         let date = new Date(dateString);
         if (Number.isNaN(date.valueOf())) {
@@ -188,7 +188,7 @@ class CameraStream {
         }
         const newDirectory = dayDirectory(this.storagePath, date);
         await fsAsync.mkdir(newDirectory, { recursive: true });
-        const newFilename = `${date.toISOString().split(':').join(' ').split('.')[0]}.mp4`;
+        const newFilename = `${date.toISOString().split(':').join(' ').split('.')[0]}.mkv`;
         const newFilepath = path.join(newDirectory, newFilename);
         await fsAsync.rename(filepath, newFilepath);
         this.log(`Moved ${date.toISOString()}`);

@@ -10,9 +10,10 @@
         <%- include('includes/breadcrumb.ejs') %>
 
         <video width="100%" controls>
-            <source src="<%= videoUrl %>" type="video/mp4">
+            <source src="<%= videoUrl %>">
         </video>
     </div>
 
+    <%- include('includes/video-keys.ejs') %>
     <%- include('includes/footer.ejs') %>
     <%- include('includes/end.ejs') %>

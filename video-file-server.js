@@ -6,13 +6,14 @@ var router = express.Router();
 
 const storage = require('./storage.json');
 
-router.get('/api/*.mp4', (req, res, next) => {
+router.get('/api/*.:ext', (req, res, next) => {
     // const location = req.params.location;
     // const year = req.params.year;
     // const month = req.params.month;
     // const day = req.params.day;
     // const filename = req.params.filename;
-    const parts = `${req.params['0']}.mp4`.split('/').filter(x => x.length > 0);
+    const ext = req.params.ext;
+    const parts = `${req.params['0']}.${ext}`.split('/').filter(x => x.length > 0);
 
 
     // https://stackoverflow.com/a/24977085/10159640
@@ -33,18 +34,26 @@ router.get('/api/*.mp4', (req, res, next) => {
             console.log('no req range header')
             return res.status(416).send();
         }
-        var positions = range.replace(/bytes=/, "").split("-");
-        var start = parseInt(positions[0], 10);
-        var total = stats.size;
-        var end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-        var chunksize = (end - start) + 1;
 
-        res.writeHead(206, {
-            "Content-Range": "bytes " + start + "-" + end + "/" + total,
+        var videoSize = stats.size;
+
+        // Parse Range
+        // Example: "bytes=32324-"
+        const CHUNK_SIZE = 10 ** 6; // 1MB
+        const start = Number(range.replace(/\D/g, ""));
+        const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+
+        // Create headers
+        const contentLength = end - start + 1;
+        const headers = {
+            "Content-Range": `bytes ${start}-${end}/${videoSize}`,
             "Accept-Ranges": "bytes",
-            "Content-Length": chunksize,
-            "Content-Type": "video/mp4"
-        });
+            "Content-Length": contentLength,
+            "Content-Type": `video/${ext}`,
+        };
+        
+        // HTTP Status 206 for Partial Content
+        res.writeHead(206, headers);
 
         var stream = fs.createReadStream(filepath, { start: start, end: end })
             .on("open", function () {

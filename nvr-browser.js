@@ -16,12 +16,9 @@ app.use(require('./video-file-server'));
 
 app.use(express.static('public'));
 
-app.get('*.*', async (req, res, next) => {
-    const filetype = req.params['1'];
-    if (filetype != 'mp4') {
-        return res.status(400).send('Not an .mp4 file');
-    }
-    const route = `${req.params['0']}.mp4`.split('/').filter(x => x.length > 0);
+app.get('*.:ext', async (req, res, next) => {
+    const filetype = req.params.ext;
+    const route = `${req.params['0']}.${filetype}`.split('/').filter(x => x.length > 0);
 
     const breadcrumbs = [];
     const currentParts = [];
@@ -33,7 +30,7 @@ app.get('*.*', async (req, res, next) => {
         })
         currentParts.push(folder);
     }
-    
+
     const filename = route[route.length - 1];
     res.render('video', {
         pageTitle: `${filename}`,
@@ -55,7 +52,6 @@ app.get('*', async (req, res, next) => {
         })
         currentParts.push(folder);
     }
-    
 
     const directory = path.join(storage.rootpath, ...route);
     const folderItems = (await fsAsync.readdir(directory, { withFileTypes: true })).map(dirent => dirent.name);

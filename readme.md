@@ -32,6 +32,9 @@ If you just want to record video without the browser, you can choose to only run
 ## Notes about the code and methods used
 **Extra details about the implementation and ffmpeg configuration**
 
+### MP4 vs MKV
+`mkv` files seem to be more resistent to corruption. When unplugging the camera while an `mp4` file is being written to, the file is un-openable. When recording to an `mkv` file and the camera is unplugged, the files can be played and data is available until nearly the point of unplugging. `mkv` files can be played in the browser in the latest version of Chrome (as of October 2021). 
+
 ### Connecting to camera streams
 Using a wireless connection for the cameras appears to work well, and the video feeds very rarely drop connections (usually <60 seconds a day). However using a wireless connection for the Raspberry Pi 3b+ causes many video connection drops, often several minutes a day. For this reason **it is recommended to use a wired network connection for the Raspberry Pi / base station**.
 
@@ -50,7 +53,7 @@ The best results are achieved with a filewatcher script. The filewatcher looks f
 ### Saving the streams
 The streams are saved in 5 minute segments at "regular" 5 minute intervals (i.e. at 00:00:00, 00:05:00, 00:10:00, etc.). The naming configuration offered by `ffmpeg` allows for some customisation of the filenames, but we change the filenames to a "friendlier" UTC-like format of:
 ```
-yyyy-mm-ddThh mm ss.mp4
+yyyy-mm-ddThh mm ss.mkv
 ``` 
 This allows easy identification of the file time as a human, and the filename is also easily parsable back to a UTC time. 
 
@@ -60,11 +63,11 @@ This allows easy identification of the file time as a human, and the filename is
 
 The file that the stream is currently being written to is located in a `raw` folder. The `ffmpeg` configured datetime pattern does not seem to parse correctly according to `ISO8601` on Windows, with the lower case `z` parsing to a descriptor like `GMT Summer Time` instead of `+0100`. This causes problems with the default `Date()` parsing which the code automatically accounts for on Windows machines.
 ```
-/camera-name/raw/%Y-%m-%dT%H %M %S%z.mp4
+/camera-name/raw/%Y-%m-%dT%H %M %S%z.mkv
 ```
 A file watcher looks for when multiple files exist in the `raw` directory, and moves all but the newest file to the camera's day directory (below), renaming it at the same time.
 ```
-/camera-name/year/month/day/yyyy-mm-ddThh mm ss.mp4
+/camera-name/year/month/day/yyyy-mm-ddThh mm ss.mkv
 ```
 
 ### Detecting corrupted video files

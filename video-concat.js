@@ -6,12 +6,11 @@ const childProcess = require("child_process");
 const probeCheck = require('./probe-check');
 
 module.exports.combineFilesInDirectory = async (directory, deleteOld = false) => {
-    console.log(`Combining .mp4 files in ${directory}...`);
+    console.log(`Combining video files in ${directory}...`);
     const filenames = await makeListOfFilesInDir(directory);
     const success = await runCombinationProcess(directory);
     console.log(`Combination success: ${success}`);
     if (deleteOld && success) await deleteFiles(directory, filenames);
-    // await deleteListOfFilesInDir(directory);
 }
 
 function runCombinationProcess(directory, listName = 'files.txt') {
@@ -20,7 +19,7 @@ function runCombinationProcess(directory, listName = 'files.txt') {
             '-hide_banner',
             '-y',
             '-loglevel', 'warning',
-            '-f', 'concat', '-safe', '0', '-i', `${path.join(directory, listName)}`, '-c', 'copy', `${path.join(directory, 'output.mp4')}`];
+            '-f', 'concat', '-safe', '0', '-i', `${path.join(directory, listName)}`, '-c', 'copy', `${path.join(directory, 'output.mkv')}`];
 
         log('Running combination command...');
         let ffmpegProcess = childProcess.spawn("ffmpeg", commandArgs, {});
@@ -50,7 +49,7 @@ function log(message, ...optionalParams) {
     console.log(`${new Date().toISOString()} ${message}`, ...optionalParams);
 }
 
-function makeListOfFilesInDir(dir, ext = '.mp4', listName = 'files.txt') {
+function makeListOfFilesInDir(dir, ext = '.mkv', listName = 'files.txt') {
     return new Promise(async (resolve, reject) => {
         let listOfFiles = getFilesInDir(dir, ext);
         console.log('listOfFiles', listOfFiles);
@@ -78,11 +77,11 @@ function makeListOfFilesInDir(dir, ext = '.mp4', listName = 'files.txt') {
     })
 }
 
-function getFilesInDir(dir, ext = '.mp4') {
+function getFilesInDir(dir, ext = '.mkv') {
     let listOfFiles = fs.readdirSync(dir);
     listOfFiles = listOfFiles.sort();
     listOfFiles = listOfFiles.filter(x => x.endsWith(ext));
-    listOfFiles = listOfFiles.filter(x => x != 'output.mp4');
+    listOfFiles = listOfFiles.filter(x => x != 'output.mkv');
     return listOfFiles;
 }
 

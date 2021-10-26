@@ -1,9 +1,5 @@
-const path = require('path');
-const fsAsync = require('fs').promises;
-
 const express = require('express');
 const app = express();
-const storage = require('./storage.json');
 
 const port = 3001;
 
