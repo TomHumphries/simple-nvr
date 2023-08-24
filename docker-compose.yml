@@ -1,0 +1,14 @@
+version: '3'
+services:
+  simple-nvr:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    image: "simple-nvr"
+    volumes:
+      - /home/pi/simple-nvr/files:/home/pi/simple-nvr/files
+    ports:
+      - "3001:3001"
+      - "3002:3000"
+    restart: always    
+

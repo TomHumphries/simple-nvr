@@ -1,0 +1,16 @@
+[{
+    "name": "simple-nvr",
+    "script": "nvr.js",
+    "instances": "1",
+    "env": {
+      "NODE_ENV": "development"
+    }
+  },
+  {
+    "name": "simple-nvr-browser",
+    "script": "nvr-browser.js",
+    "instances": "1",
+    "env": {
+      "NODE_ENV": "development"
+    }
+  }]
